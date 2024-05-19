@@ -1,0 +1,46 @@
+version: '3'
+services:
+  front-end:
+    image: nabeel-frontend:latest
+    ports:
+      - 5173:5173
+    environment:
+      - REACT_APP_BACKEND_URL=http://localhost:8000
+      - PORT=5173
+    depends_on:
+      - backend
+
+  backend:
+    image: nabeel-backend:latest
+    ports:
+      - 8000:8000
+    environment:
+      - MONGO_URI=mongodb+srv://mealmate:mealmate@cluster0.uy9hfgw.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+      - JWT_PRIVATE_KEY=secret123
+      - PORT=8000
+      - SALT=10
+    depends_on:
+      - mongodb
+
+  mongodb:
+    image: mongo:jammy   
+    ports:
+      - :27017
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=password
+    volumes:
+      - mongo-data:/data/db
+      
+  mongo-express:
+    image: mongo-express:1-20-alpine3.19
+    ports:
+      - :8081
+    environment:
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=admin
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=password
+      - ME_CONFIG_MONGODB_SERVER=mongodb
+volumes:
+  mongo-data:
+    driver: local
+
