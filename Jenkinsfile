@@ -1,30 +1,33 @@
+def gv
 pipeline {
     agent any
     stages {
+        stage('Init') {
+            steps {
+                script {
+                    gv = load = "script.groovy"
+                }
+            }
+        }
         stage('Build Docker Image') {
             steps {
                 script {
-                    dir('./backend') {
-                        echo "building docker image"
-                        withCredentials([usernamePassword(credentialsId: 'Dockerhub-Credentials', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
-                            sh "docker build -t ${USER}/backend-nabeel:2.0 ."
-                            sh "echo $PASS | docker login -u $USER --password-stdin"
-                            sh "docker push ${USER}/backend-nabeel:2.0"
-                    }
-                }
+                    gv.buildDockerImage()
                 }
             }
         }
 
         stage('Test') {
             steps {
-                echo "testing" 
+                script {
+                    gv.testApp()
+                }
             }
         }
 
         stage('Deploy') {
             steps {
-                echo "deploying"
+                gv.deployApp()
             }
         }
     }
